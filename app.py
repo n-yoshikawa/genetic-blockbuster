@@ -96,7 +96,6 @@ def get_mutant(smiles):
         try:
             Chem.SanitizeMol(new_mol)
         except:
-            print("Sanitize failed:", new_smiles)
             continue
         new_smiles = Chem.MolToSmiles(new_mol)
         if new_smiles != smiles:
@@ -109,12 +108,10 @@ def show():
     global rsmi
     global generation
 
-    print(int(request.json["generation"]))
-    if int(request.json["generation"]) > generation - 5:
-        generation += 1
-        smiles = canonicalize(request.json["smiles"])
-        lsmi = get_mutant(smiles)
-        rsmi = get_mutant(smiles)
+    generation += 1
+    smiles = canonicalize(request.json["smiles"])
+    lsmi = get_mutant(smiles)
+    rsmi = get_mutant(smiles)
 
     return_json = {
         "leftSmiles": lsmi,
