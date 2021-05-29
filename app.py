@@ -115,7 +115,6 @@ def show():
         smiles = canonicalize(request.json["smiles"])
         lsmi = get_mutant(smiles)
         rsmi = get_mutant(smiles)
-        print('{},{},{}'.format(generation, lsmi, rsmi))
 
     return_json = {
         "leftSmiles": lsmi,
