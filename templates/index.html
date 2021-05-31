@@ -30,7 +30,7 @@
             </div>
             <div class="text-center">
             <code id="rsmi" class="d-block mx-auto text-center text-break"></code>
-            <span id="rshare"><a href="https://twitter.com/share" class="twitter-share-button mx-auto" data-text="遺伝的アルゴリズムで新しい分子を作ったよ！とっても素敵な分子！ http://genetic-blockbuster.herokuapp.com/" data-url="" data-lang="ja">Tweet</a></span>
+            <span id="rshare"></span>
             </div>
         </div>
     </div>
@@ -73,9 +73,9 @@
         generation = JSON.parse(data.values).generation;
         $("#lsmi").html(lsmi);
         $("#rsmi").html(rsmi);
+        $("#lshare").html('<a href="https://twitter.com/share" class="twitter-share-button mx-auto" data-text="遺伝的アルゴリズムで新しい分子を作ったよ！とっても素敵な分子！ http://genetic-blockbuster.herokuapp.com/" data-url="https://chemical.space/editor?smi='+encodeURIComponent(lsmi)+'" data-lang="ja">Tweet</a>')
+        $("#rshare").html('<a href="https://twitter.com/share" class="twitter-share-button mx-auto" data-text="遺伝的アルゴリズムで新しい分子を作ったよ！とっても素敵な分子！ http://genetic-blockbuster.herokuapp.com/" data-url="https://chemical.space/editor?smi='+encodeURIComponent(rsmi)+'" data-lang="ja">Tweet</a>')
         $("#generation").html(generation);
-        $("#lshare").attr("data-url", "https://chemical.space/editor?smi="+lsmi);
-        $("#rshare").attr("data-url", "https://chemical.space/editor?smi="+rsmi);
         twttr.widgets.load();
         $("#msg").html('どっちの方がブロックバスターかな？');
     }).fail(function(data) {
@@ -114,8 +114,8 @@
             generation = JSON.parse(data.values).generation;
             $("#lsmi").html(lsmi);
             $("#rsmi").html(rsmi);
-            $("#lshare").html('<a href="https://twitter.com/share" class="twitter-share-button mx-auto" data-text="遺伝的アルゴリズムで新しい分子を作ったよ！とっても素敵な分子！ http://genetic-blockbuster.herokuapp.com/" data-url="https://chemical.space/editor?smi='+lsmi+'" data-lang="ja">Tweet</a>')
-            $("#rshare").html('<a href="https://twitter.com/share" class="twitter-share-button mx-auto" data-text="遺伝的アルゴリズムで新しい分子を作ったよ！とっても素敵な分子！ http://genetic-blockbuster.herokuapp.com/" data-url="https://chemical.space/editor?smi='+rsmi+'" data-lang="ja">Tweet</a>')
+            $("#lshare").html('<a href="https://twitter.com/share" class="twitter-share-button mx-auto" data-text="遺伝的アルゴリズムで新しい分子を作ったよ！とっても素敵な分子！ http://genetic-blockbuster.herokuapp.com/" data-url="https://chemical.space/editor?smi='+encodeURIComponent(lsmi)+'" data-lang="ja">Tweet</a>')
+            $("#rshare").html('<a href="https://twitter.com/share" class="twitter-share-button mx-auto" data-text="遺伝的アルゴリズムで新しい分子を作ったよ！とっても素敵な分子！ http://genetic-blockbuster.herokuapp.com/" data-url="https://chemical.space/editor?smi='+encodeURIComponent(rsmi)+'" data-lang="ja">Tweet</a>')
             twttr.widgets.load();
             $("#generation").html(generation);
             $('.structure').css('opacity', '1.0');
@@ -146,8 +146,8 @@
             generation = JSON.parse(data.values).generation;
             $("#lsmi").html(lsmi);
             $("#rsmi").html(rsmi);
-            $("#lshare").html('<a href="https://twitter.com/share" class="twitter-share-button mx-auto" data-text="遺伝的アルゴリズムで新しい分子を作ったよ！とっても素敵な分子！ http://genetic-blockbuster.herokuapp.com/" data-url="https://chemical.space/editor?smi='+lsmi+'" data-lang="ja">Tweet</a>')
-            $("#rshare").html('<a href="https://twitter.com/share" class="twitter-share-button mx-auto" data-text="遺伝的アルゴリズムで新しい分子を作ったよ！とっても素敵な分子！ http://genetic-blockbuster.herokuapp.com/" data-url="https://chemical.space/editor?smi='+rsmi+'" data-lang="ja">Tweet</a>')
+            $("#lshare").html('<a href="https://twitter.com/share" class="twitter-share-button mx-auto" data-text="遺伝的アルゴリズムで新しい分子を作ったよ！とっても素敵な分子！ http://genetic-blockbuster.herokuapp.com/" data-url="https://chemical.space/editor?smi='+encodeURIComponent(lsmi)+'" data-lang="ja">Tweet</a>')
+            $("#rshare").html('<a href="https://twitter.com/share" class="twitter-share-button mx-auto" data-text="遺伝的アルゴリズムで新しい分子を作ったよ！とっても素敵な分子！ http://genetic-blockbuster.herokuapp.com/" data-url="https://chemical.space/editor?smi='+encodeURIComponent(rsmi)+'" data-lang="ja">Tweet</a>')
             twttr.widgets.load();
             $("#generation").html(generation);
             $('.structure').css('opacity', '1.0');
