@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+import copy
 import json
+import random
 
 from flask import Flask, render_template, jsonify, request
 from rdkit import Chem
@@ -11,9 +13,15 @@ import mutate as mu
 # app.py
 app = Flask(__name__)
 
-lsmi = 'N#CC1=C(SCC(=O)Nc2cccc(Cl)c2)N=C([O-])[C@H](C#N)C12CCCCC2'
-rsmi = 'O=[N+]([O-])c1c(Nc2cccc3ncccc23)ncnc1N1CCN(c2cccc(Cl)c2)CC1'
 generation = 0
+population = ['CCO' for _ in range(5)] + ['c1ccccc1' for _ in range(5)]
+
+def choose_parents():
+    lsmi = random.choice(population)
+    population2 = copy.deepcopy(population)
+    population2.remove(lsmi)
+    rsmi = random.choice(population2)
+    return lsmi, rsmi
 
 @app.route('/')
 def index():
@@ -21,6 +29,7 @@ def index():
 
 @app.route('/start', methods=['POST'])
 def start():
+    lsmi, rsmi = choose_parents()
     return_json = {
         "leftSmiles": lsmi,
         "rightSmiles": rsmi,
@@ -28,29 +37,40 @@ def start():
     }
     return jsonify(values=json.dumps(return_json))
 
-def mutate(smiles):
-    mol = Chem.MolFromSmiles(smiles)
-    mutant = None
-    while mutant is None:
-        mutant = mu.mutate(mol, 1.0)
+
+def reproduce(smiles1, smiles2):
+    mol1 = Chem.MolFromSmiles(smiles1)
+    mol2 = Chem.MolFromSmiles(smiles1)
+    for _ in range(100):
+        child = co.crossover(mol1, mol2)
+        if child != None:
+            child = mu.mutate(child, 0.5)
         try:
-            Chem.SanitizeMol(mutant)
+            Chem.SanitizeMol(child)
         except:
             continue
-    return Chem.MolToSmiles(mutant)
+        smiles_child = Chem.MolToSmiles(child)
+        if smiles_child == smiles1 or smiles_child == smiles2:
+            continue
+        return smiles_child
+    return None
 
 
 @app.route('/mutate', methods=['POST'])
 def show():
-    global lsmi
-    global rsmi
     global generation
+    global population
 
-    generation += 1
-    smiles = request.json["smiles"]
+    winner = request.json["winner"]
+    loser = request.json["loser"]
 
-    lsmi = mutate(smiles)
-    rsmi = mutate(smiles)
+    if winner in population and loser in population:
+        child = reproduce(winner, loser)
+        if child is not None and child not in population:
+            generation += 1
+            population.remove(loser)
+            population.append(child)
+    lsmi, rsmi = choose_parents()
 
     return_json = {
         "leftSmiles": lsmi,

@@ -35,7 +35,7 @@
 </main>
 <script>
     // Initialize the drawer to draw to canvas
-    let smilesDrawer = new SmilesDrawer.Drawer({ width: 400, height: 400 });
+    let smilesDrawer = new SmilesDrawer.Drawer({ width: 360, height: 360 });
     var lsmi = '';
     var rsmi = '';
     var loading = true;
@@ -69,14 +69,16 @@
             return;
         }
         loading = true;
-        var smi = lsmi;
+        var winner = lsmi;
+        var loser = rsmi;
         if (value == 'right') {
+            winner = rsmi;
             smi = rsmi;
         } 
         $.ajax({
             type: "POST",
             url:"/mutate",
-            data: JSON.stringify({"smiles": smi, "generation": generation}),
+            data: JSON.stringify({"winner": winner, "loser": loser}),
             contentType: "application/json",
             beforeSend: function() {
                 $("#msg").html('通信中');
