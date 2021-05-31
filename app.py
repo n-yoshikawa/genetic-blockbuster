@@ -3,7 +3,7 @@ import copy
 import json
 import random
 
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, session
 from rdkit import Chem
 from rdkit import rdBase
 
@@ -12,11 +12,9 @@ import mutate as mu
 
 # app.py
 app = Flask(__name__)
+app.secret_key = 'hogefuga'
 
-generation = 0
-population = ['CCO' for _ in range(5)] + ['c1ccccc1' for _ in range(5)]
-
-def choose_parents():
+def choose_parents(population):
     lsmi = random.choice(population)
     population2 = copy.deepcopy(population)
     population2.remove(lsmi)
@@ -25,11 +23,15 @@ def choose_parents():
 
 @app.route('/')
 def index():
+    session['generation'] = 0
+    session['population'] = ['CCO' for _ in range(5)] + ['c1ccccc1' for _ in range(5)]
     return render_template("index.html")
 
 @app.route('/start', methods=['POST'])
 def start():
-    lsmi, rsmi = choose_parents()
+    population = session['population']
+    generation = session['generation']
+    lsmi, rsmi = choose_parents(population)
     return_json = {
         "leftSmiles": lsmi,
         "rightSmiles": rsmi,
@@ -38,10 +40,25 @@ def start():
     return jsonify(values=json.dumps(return_json))
 
 
-def reproduce(smiles1, smiles2):
-    mol1 = Chem.MolFromSmiles(smiles1)
-    mol2 = Chem.MolFromSmiles(smiles1)
-    for _ in range(100):
+@app.route('/reset', methods=['POST'])
+def reset():
+    session['generation'] = 0
+    session['population'] = ['CCO' for _ in range(5)] + ['c1ccccc1' for _ in range(5)]
+    population = session['population']
+    generation = session['generation']
+    lsmi, rsmi = choose_parents(population)
+    return_json = {
+        "leftSmiles": lsmi,
+        "rightSmiles": rsmi,
+        "generation": generation
+    }
+    return jsonify(values=json.dumps(return_json))
+
+
+def reproduce(winner, loser):
+    mol1 = Chem.MolFromSmiles(winner)
+    mol2 = Chem.MolFromSmiles(loser)
+    for _ in range(10):
         child = co.crossover(mol1, mol2)
         if child != None:
             child = mu.mutate(child, 0.5)
@@ -50,16 +67,26 @@ def reproduce(smiles1, smiles2):
         except:
             continue
         smiles_child = Chem.MolToSmiles(child)
-        if smiles_child == smiles1 or smiles_child == smiles2:
+        if smiles_child == winner or smiles_child == loser:
             continue
         return smiles_child
+    for _ in range(10):
+        mutant = mu.mutate(mol1, 1.0)
+        try:
+            Chem.SanitizeMol(mutant)
+        except:
+            continue
+        smiles_mutant = Chem.MolToSmiles(mutant)
+        if smiles_mutant == winner or smiles_mutant == loser:
+            continue
+        return smiles_mutant
     return None
 
 
 @app.route('/mutate', methods=['POST'])
 def show():
-    global generation
-    global population
+    generation = session['generation']
+    population = session['population']
 
     winner = request.json["winner"]
     loser = request.json["loser"]
@@ -70,7 +97,9 @@ def show():
             generation += 1
             population.remove(loser)
             population.append(child)
-    lsmi, rsmi = choose_parents()
+            session['population'] = population
+            session['generation'] = generation
+    lsmi, rsmi = choose_parents(population)
 
     return_json = {
         "leftSmiles": lsmi,

@@ -15,17 +15,25 @@
     <h1 class="mt-5">遺伝的アルゴリズムで最高にブロックバスターな分子を作ろう！</h1>
     <p class="text-right lead">第<span id="generation">?</span>世代</p>
     <div class="row">
-        <div class="col-12 col-lg-6 border structure" onclick="buttonClick('left')">
-            <canvas id="left-canvas" class="d-block mx-auto" width="360" height="360" ></canvas>
+        <div class="col-12 col-lg-6 border structure">
+            <div class="container" onclick="buttonClick('left')">
+                <canvas id="left-canvas" class="d-block mx-auto" width="360" height="360"></canvas>
+            </div>
             <code id="lsmi" class="d-block mx-auto text-center text-break"></code>
         </div>
-        <div class="col-12 col-lg-6 border structure" onclick="buttonClick('right')">
-            <canvas id="right-canvas" class="d-block mx-auto" width="360" height="360"></canvas>
+        <div class="col-12 col-lg-6 border structure">
+            <div class="container" onclick="buttonClick('right')">
+                <canvas id="right-canvas" class="d-block mx-auto" width="360" height="360"></canvas>
+            </div>
             <code id="rsmi" class="d-block mx-auto text-center text-break"></code>
         </div>
     </div>
     <p id="msg" class="mt-3"></p>
+    <div class="text-right">
+    <button type="button" class="btn btn-danger" onclick="resetClick()">リセットする</button>
+    </div>
     <div class="mt-5">
+    <p>ベンゼンとエタノールだけの第0世代から進化させて君だけのブロックバスターを作ろう！</p>
     <ul>
     <li>Reference: <a href="http://dx.doi.org/10.1039/C8SC05372C">A graph-based genetic algorithm and generative model/Monte Carlo tree search for the exploration of chemical space</a></li>
     <li>GitHub: <a href="https://github.com/n-yoshikawa/genetic-blockbuster">n-yoshikawa/genetic-blockbuster</a></li>
@@ -102,6 +110,34 @@
             console.log("Ajax failed.");
         });
         loading = false;
+    }
+    function resetClick(value){
+        $.ajax({
+            type: "POST",
+            url:"/reset",
+            data: JSON.stringify({}),
+            contentType: "application/json",
+            beforeSend: function() {
+                $("#msg").html('通信中');
+                $('.structure').css('opacity', '0.2');}
+        }).done(function(data) {
+            $("#msg").html('どっちの方がブロックバスターかな？');
+            lsmi = JSON.parse(data.values).leftSmiles;
+            SmilesDrawer.parse(lsmi, function(tree) {
+                smilesDrawer.draw(tree, "left-canvas", "light", false);
+            });
+            rsmi = JSON.parse(data.values).rightSmiles;
+            SmilesDrawer.parse(rsmi, function(tree) {
+                smilesDrawer.draw(tree, "right-canvas", "light", false);
+            });
+            generation = JSON.parse(data.values).generation;
+            $("#lsmi").html(lsmi);
+            $("#rsmi").html(rsmi);
+            $("#generation").html(generation);
+            $('.structure').css('opacity', '1.0');
+        }).fail(function(data) {
+            console.log("Ajax failed.");
+        });
     }
     </script>
 </body>
