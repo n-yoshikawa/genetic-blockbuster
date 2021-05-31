@@ -2,6 +2,7 @@
 import copy
 import json
 import random
+import urllib
 
 from flask import Flask, render_template, jsonify, request, session
 from rdkit import Chem
@@ -26,6 +27,17 @@ def index():
     session['generation'] = 0
     session['population'] = ['CCO' for _ in range(5)] + ['c1ccccc1' for _ in range(5)]
     return render_template("index.html")
+
+
+@app.route('/molecule')
+def detail(): 
+    if request.args.get('smi') is not None:
+        smiles = request.args.get('smi')
+    else:
+        smiles = ""
+    return render_template("molecule.html", 
+            smiles=smiles, smiles_url=urllib.parse.quote(smiles, safe='~()*!.\''))
+
 
 @app.route('/start', methods=['POST'])
 def start():
